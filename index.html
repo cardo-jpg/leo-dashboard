@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Léo Barbosa</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg:#0b1525; --card:#131f30; --card2:#182538; --border:#1e3045;
+      --cyan:#00c6ff; --green:#00e5a0; --yellow:#ffd166; --red:#ff6b6b;
+      --purple:#a78bfa; --orange:#f97316; --pink:#f472b6; --blue:#60a5fa;
+      --text:#f0f4f8; --sub:#7a90a8; --sub2:#3d5472; --grid:rgba(30,48,69,0.7);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding-bottom:60px;}
+
+    /* HEADER */
+    header{background:linear-gradient(135deg,#0b1525,#160d2f);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+    .h-logo{display:flex;align-items:center;gap:12px;}
+    .h-ig{width:36px;height:36px;border-radius:10px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;font-size:18px;}
+    .h-title{font-size:16px;font-weight:700;}
+    .h-title span{background:linear-gradient(90deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .h-sub{font-size:11px;color:var(--sub);margin-top:2px;}
+    .badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,229,160,.08);border:1px solid var(--green);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--green);}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* TABS */
+    .tabs{background:#0c1828;border-bottom:1px solid var(--border);padding:0 32px;display:flex;}
+    .tab-btn{padding:13px 20px;font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all .2s;}
+    .tab-btn:hover{color:var(--text);}
+    .tab-btn.active{color:var(--purple);border-bottom-color:var(--purple);}
+    .tab-panel{display:none;} .tab-panel.active{display:block;}
+
+    /* LAYOUT */
+    .container{max-width:1440px;margin:0 auto;padding:28px 32px;}
+    .sec-title{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:1.5px;margin:28px 0 14px;}
+
+    /* KPI CARDS */
+    .kpi-row{display:flex;gap:10px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px;}
+    .kpi{flex:1;min-width:130px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+    .kpi-lbl{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+    .kpi-val{font-size:22px;font-weight:800;line-height:1.1;}
+    .kpi-note{font-size:10px;color:var(--sub);margin-top:4px;}
+    .k-purple{border-top:2px solid var(--purple);} .k-cyan{border-top:2px solid var(--cyan);}
+    .k-green{border-top:2px solid var(--green);} .k-orange{border-top:2px solid var(--orange);}
+    .k-pink{border-top:2px solid var(--pink);} .k-yellow{border-top:2px solid var(--yellow);}
+    .k-blue{border-top:2px solid var(--blue);}
+    .cv{color:var(--purple);} .cc{color:var(--cyan);} .cg{color:var(--green);}
+    .co{color:var(--orange);} .cp{color:var(--pink);} .cy{color:var(--yellow);} .cb{color:var(--blue);}
+
+    /* CHARTS */
+    .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+    .chart-row.single{grid-template-columns:1fr;}
+    .chart-row.triple{grid-template-columns:2fr 1fr;}
+    .chart-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
+    .chart-box-ttl{font-size:13px;font-weight:700;margin-bottom:2px;}
+    .chart-box-sub{font-size:11px;color:var(--sub);margin-bottom:16px;}
+    .cw{position:relative;} .h220{height:220px;} .h260{height:260px;} .h280{height:280px;} .h300{height:300px;}
+
+    /* DIVIDER */
+    .divider{border:none;border-top:1px solid var(--border);margin:8px 0 20px;}
+
+    /* TABLE */
+    .tbl-box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+    .tbl-head{background:var(--card2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+    .tbl-head-title{font-size:12px;font-weight:700;}
+    .tbl-scroll{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:var(--card2);font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;padding:9px 14px;text-align:left;white-space:nowrap;}
+    td{padding:10px 14px;font-size:12.5px;border-top:1px solid var(--border);white-space:nowrap;}
+    tr:hover td{background:rgba(255,255,255,.025);}
+    .tr{text-align:right;}
+    .tnm{max-width:240px;overflow:hidden;text-overflow:ellipsis;}
+    .lnk{color:var(--cyan);font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+    .lnk:hover{text-decoration:underline;}
+    .badge-active{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(0,229,160,.1);color:var(--green);}
+    .badge-paused{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(122,144,168,.1);color:var(--sub);}
+    .pill-v{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(0,229,160,.1);color:var(--green);}
+    .pill-c{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(167,139,250,.1);color:var(--purple);}
+    .pill-i{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(0,198,255,.1);color:var(--cyan);}
+    /* Month filter */
+    .mf-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+    .mf-btn{padding:5px 13px;font-size:11px;font-weight:600;color:var(--sub);background:var(--card);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all .15s;}
+    .mf-btn:hover{color:var(--text);border-color:var(--purple);}
+    .mf-btn.active{background:rgba(167,139,250,.15);color:var(--purple);border-color:var(--purple);}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="h-logo">
+    <div class="h-ig">💄</div>
+    <div>
+      <div class="h-title">Dashboard · <span>Léo Barbosa</span></div>
+      <div class="h-sub" id="h-sub">⏳ Carregando dados...</div>
+    </div>
+  </div>
+  <div class="badge"><span class="dot"></span>Ao vivo</div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('imp',this)">🚀 Impulsionados + Seguidores</button>
+  <button class="tab-btn" onclick="switchTab('org',this)">🌱 Orgânico</button>
+</div>
+
+<!-- ══ IMPULSIONADOS + SEGUIDORES ═══════════════════════════════ -->
+<div id="panel-imp" class="tab-panel active">
+<div class="container">
+
+  <p class="sec-title">Resultados da Campanha · Acompanhamento Diário</p>
+  <div class="kpi-row">
+    <div class="kpi k-orange"><p class="kpi-lbl">Investimento</p><p class="kpi-val co" id="d-invest">—</p><p class="kpi-note" id="d-period">período selecionado</p></div>
+    <div class="kpi k-purple"><p class="kpi-lbl">Novos Seguidores</p><p class="kpi-val cv" id="d-seg">—</p><p class="kpi-note">total do período</p></div>
+    <div class="kpi k-cyan"><p class="kpi-lbl">CPS Médio</p><p class="kpi-val cc" id="d-cps">—</p><p class="kpi-note">custo por seguidor</p></div>
+    <div class="kpi k-yellow"><p class="kpi-lbl">Cliques</p><p class="kpi-val cy" id="d-cliques">—</p><p class="kpi-note" id="d-cpc-note">CPC —</p></div>
+    <div class="kpi k-green"><p class="kpi-lbl">Impressões</p><p class="kpi-val cg" id="d-imp">—</p><p class="kpi-note" id="d-cpm-note">CPM —</p></div>
+  </div>
+
+  <div id="month-filter-bar" class="mf-bar"></div>
+
+  <div class="chart-row">
+    <div class="chart-box">
+      <p class="chart-box-ttl">Novos Seguidores por Dia</p>
+      <p class="chart-box-sub">Barras = seguidores captados · Linha = custo por seguidor (CPS)</p>
+      <div class="cw h280"><canvas id="d-chart1"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <p class="chart-box-ttl">Investimento Diário</p>
+      <p class="chart-box-sub">Barras = investimento · Linha = impressões</p>
+      <div class="cw h280"><canvas id="d-chart2"></canvas></div>
+    </div>
+  </div>
+
+  <div class="tbl-box">
+    <div class="tbl-head" style="justify-content:space-between">
+      <span class="tbl-head-title">Rastreamento de Seguidores · Posts Ativos</span>
+      <span style="font-size:10px;color:var(--sub);font-weight:500">Planilha manual</span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>Post</th>
+          <th class="tr">Seguidores (Ganho)</th>
+          <th class="tr">Ganho</th>
+          <th class="tr">Investimento</th>
+          <th class="tr">CPS</th>
+          <th class="tr">CPC</th>
+          <th>Link</th>
+        </tr></thead>
+        <tbody id="s-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tbl-box">
+    <div class="tbl-head" style="justify-content:space-between">
+      <span class="tbl-head-title">Detalhamento por Dia</span>
+      <span style="font-size:10px;color:var(--sub);font-weight:500">planilha manual · ordem decrescente</span>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>Data</th>
+          <th class="tr">Novos Seg.</th>
+          <th class="tr">Investimento</th>
+          <th class="tr">CPS</th>
+          <th class="tr">Cliques</th>
+          <th class="tr">CPC</th>
+          <th class="tr">Impressões</th>
+          <th class="tr">CPM</th>
+        </tr></thead>
+        <tbody id="d-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ ORGÂNICO ═════════════════════════════════════════════════ -->
+<div id="panel-org" class="tab-panel">
+<div class="container">
+
+  <p class="sec-title">Visão Geral · Posts Orgânicos · Instagram Insights</p>
+  <div class="kpi-row">
+    <div class="kpi k-purple"><p class="kpi-lbl">Posts</p><p class="kpi-val cv" id="o-posts">—</p><p class="kpi-note" id="o-period">—</p></div>
+    <div class="kpi k-cyan"><p class="kpi-lbl">Alcance Total</p><p class="kpi-val cc" id="o-alcance">—</p><p class="kpi-note">pessoas únicas</p></div>
+    <div class="kpi k-pink"><p class="kpi-lbl">Curtidas</p><p class="kpi-val cp" id="o-curtidas">—</p><p class="kpi-note" id="o-avg-curt">—/post</p></div>
+    <div class="kpi k-green"><p class="kpi-lbl">Salvamentos</p><p class="kpi-val cg" id="o-salv">—</p><p class="kpi-note" id="o-avg-salv">—/post</p></div>
+    <div class="kpi k-orange"><p class="kpi-lbl">Seg. Ganhos</p><p class="kpi-val co" id="o-segs">—</p><p class="kpi-note">posts orgânicos</p></div>
+    <div class="kpi k-yellow"><p class="kpi-lbl">Compartilhamentos</p><p class="kpi-val cy" id="o-comp">—</p><p class="kpi-note">total</p></div>
+    <div class="kpi k-blue"><p class="kpi-lbl">Visitas ao Perfil</p><p class="kpi-val cb" id="o-visitas">—</p><p class="kpi-note">via posts</p></div>
+  </div>
+
+  <div class="chart-row triple">
+    <div class="chart-box">
+      <p class="chart-box-ttl">Alcance por Post · Top 10</p>
+      <p class="chart-box-sub">Posts orgânicos ordenados por alcance</p>
+      <div class="cw h300"><canvas id="o-chart1"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <p class="chart-box-ttl">Mix de Engajamento</p>
+      <p class="chart-box-sub">Distribuição por tipo de interação</p>
+      <div class="cw h300"><canvas id="o-chart2"></canvas></div>
+    </div>
+  </div>
+
+  <div class="tbl-box">
+    <div class="tbl-head"><span class="tbl-head-title">Todos os Posts Orgânicos</span></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>Data</th><th>Tipo</th>
+          <th class="tr">Alcance</th><th class="tr">Impressões*</th>
+          <th class="tr">Curtidas</th><th class="tr">Comentários</th>
+          <th class="tr">Compartilhamentos</th><th class="tr">Salvamentos</th>
+          <th class="tr">Seg. Ganhos</th><th class="tr">Visitas Perfil</th>
+          <th>Link</th>
+        </tr></thead>
+        <tbody id="o-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── SHEET IDs LÉON ───────────────────────────────────────────
+const LEO_MAIN_ID = '1txFlnOgVgBz2bdA1DM7574NKI1IlzjD2';
+const ORG_ID      = '1T2MhcCjA6jIdMTqUA3JVpIiMX6SgkwwftjyypHhNuSI';
+const GVT_MAIN    = `https://docs.google.com/spreadsheets/d/${LEO_MAIN_ID}/gviz/tq?tqx=out:csv`;
+const GVT_ORG     = `https://docs.google.com/spreadsheets/d/${ORG_ID}/gviz/tq?tqx=out:csv&gid=1387861195`;
+
+// ── DADOS HARDCODED (26/05) — renderizados imediatamente ─────
+const BASE_DAILY = [
+  {'DATA':'19/05','Novos Seguidores':'15','Investimento diário':'R$ 14,78','Custo por novos seguidores':'R$ 0,99','Cliques':'142','CPC':'R$ 0,10','Impressões':'2041','CPM':'R$ 7,24'},
+  {'DATA':'20/05','Novos Seguidores':'19','Investimento diário':'R$ 17,20','Custo por novos seguidores':'R$ 0,91','Cliques':'165','CPC':'R$ 0,10','Impressões':'2395','CPM':'R$ 7,18'},
+  {'DATA':'21/05','Novos Seguidores':'20','Investimento diário':'R$ 15,42','Custo por novos seguidores':'R$ 0,77','Cliques':'106','CPC':'R$ 0,15','Impressões':'1928','CPM':'R$ 8,00'},
+  {'DATA':'22/05','Novos Seguidores':'21','Investimento diário':'R$ 15,51','Custo por novos seguidores':'R$ 0,74','Cliques':'114','CPC':'R$ 0,14','Impressões':'1866','CPM':'R$ 8,31'},
+  {'DATA':'23/05','Novos Seguidores':'13','Investimento diário':'R$ 12,52','Custo por novos seguidores':'R$ 0,96','Cliques':'79', 'CPC':'R$ 0,16','Impressões':'1541','CPM':'R$ 8,12'},
+  {'DATA':'24/05','Novos Seguidores':'23','Investimento diário':'R$ 20,29','Custo por novos seguidores':'R$ 0,88','Cliques':'177','CPC':'R$ 0,11','Impressões':'2591','CPM':'R$ 7,83'},
+  {'DATA':'25/05','Novos Seguidores':'10','Investimento diário':'R$ 20,50','Custo por novos seguidores':'R$ 2,05','Cliques':'130','CPC':'R$ 0,16','Impressões':'2600','CPM':'R$ 7,88'},
+];
+const BASE_POSTS = [
+  {nome:'Carrossel - minhas obsessões do momento',         link:'https://www.instagram.com/p/DX_4QqbjWYx/', inv:30.15,saldo:115,cps:0.26},
+  {nome:'Carrossel - coisas simples que transformam o atendimento', link:'https://www.instagram.com/p/DYFI0krDwcp/', inv:28.15,saldo:68, cps:0.41},
+  {nome:'Carrossel - Foi assim que a maquiagem mudou a sua vida',   link:'https://www.instagram.com/p/DYKZOL1jRiG/', inv:33.72,saldo:1,  cps:33.72},
+  {nome:'carrossel - os bastidores da minha vida até aqui',         link:'https://www.instagram.com/p/DYkra8vjBD6/', inv:0,   saldo:0,  cps:0},
+  {nome:'carrossel - passo a passo maquiagem efeito glow perfeita', link:'https://www.instagram.com/p/DYmsriwGZUv/', inv:5.03,saldo:0,  cps:0},
+];
+const BASE_ORG = [
+  {'Data':'2026-04-26','Link do Post':'https://www.instagram.com/reel/DXmr90CEbkF/','Tipo de Post':'VIDEO','Alcance':'12579','Curtidas':'839','Comentários':'152','Compartilhamentos':'58','Salvamentos':'303','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-04-27','Link do Post':'https://www.instagram.com/reel/DXpyN_KkbAi/','Tipo de Post':'VIDEO','Alcance':'11280','Curtidas':'856','Comentários':'77','Compartilhamentos':'25','Salvamentos':'163','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-04-30','Link do Post':'https://www.instagram.com/reel/DXwJf-YxgB9/','Tipo de Post':'VIDEO','Alcance':'5320','Curtidas':'407','Comentários':'50','Compartilhamentos':'21','Salvamentos':'38','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-05','Link do Post':'https://www.instagram.com/p/DX9eIMAkeBZ/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'21927','Curtidas':'1210','Comentários':'134','Compartilhamentos':'22','Salvamentos':'466','Seguidores Ganhos':'9','Visitas ao Perfil':'176'},
+  {'Data':'2026-05-06','Link do Post':'https://www.instagram.com/p/DX_4QqbjWYx/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'36107','Curtidas':'2865','Comentários':'298','Compartilhamentos':'26','Salvamentos':'1348','Seguidores Ganhos':'336','Visitas ao Perfil':'710'},
+  {'Data':'2026-05-07','Link do Post':'https://www.instagram.com/reel/DYCUBx7Rv4M/','Tipo de Post':'VIDEO','Alcance':'17650','Curtidas':'332','Comentários':'57','Compartilhamentos':'16','Salvamentos':'41','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-08','Link do Post':'https://www.instagram.com/p/DYFI0krDwcp/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'12124','Curtidas':'1431','Comentários':'215','Compartilhamentos':'11','Salvamentos':'548','Seguidores Ganhos':'61','Visitas ao Perfil':'218'},
+  {'Data':'2026-05-09','Link do Post':'https://www.instagram.com/p/DYHlbs9EUa4/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'7042','Curtidas':'389','Comentários':'27','Compartilhamentos':'20','Salvamentos':'36','Seguidores Ganhos':'2','Visitas ao Perfil':'24'},
+  {'Data':'2026-05-10','Link do Post':'https://www.instagram.com/p/DYKZOL1jRiG/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'9722','Curtidas':'825','Comentários':'21','Compartilhamentos':'29','Salvamentos':'50','Seguidores Ganhos':'7','Visitas ao Perfil':'201'},
+  {'Data':'2026-05-11','Link do Post':'https://www.instagram.com/reel/DYMmq_dxMTA/','Tipo de Post':'VIDEO','Alcance':'19326','Curtidas':'1765','Comentários':'128','Compartilhamentos':'50','Salvamentos':'191','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-12','Link do Post':'https://www.instagram.com/reel/DYQaUppRkp2/','Tipo de Post':'VIDEO','Alcance':'18489','Curtidas':'980','Comentários':'95','Compartilhamentos':'31','Salvamentos':'162','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-13','Link do Post':'https://www.instagram.com/p/DYScATAkXRu/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'5674','Curtidas':'374','Comentários':'19','Compartilhamentos':'28','Salvamentos':'49','Seguidores Ganhos':'2','Visitas ao Perfil':'39'},
+  {'Data':'2026-05-14','Link do Post':'https://www.instagram.com/reel/DYUtkmmxzJq/','Tipo de Post':'VIDEO','Alcance':'3630','Curtidas':'290','Comentários':'28','Compartilhamentos':'43','Salvamentos':'18','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-14','Link do Post':'https://www.instagram.com/reel/DYVYj7exCM1/','Tipo de Post':'VIDEO','Alcance':'3739','Curtidas':'340','Comentários':'31','Compartilhamentos':'25','Salvamentos':'50','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-15','Link do Post':'https://www.instagram.com/p/DYXRJmhEVsR/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'2917','Curtidas':'302','Comentários':'74','Compartilhamentos':'12','Salvamentos':'208','Seguidores Ganhos':'3','Visitas ao Perfil':'24'},
+  {'Data':'2026-05-16','Link do Post':'https://www.instagram.com/p/DYaQerGERCk/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'3269','Curtidas':'289','Comentários':'15','Compartilhamentos':'10','Salvamentos':'20','Seguidores Ganhos':'0','Visitas ao Perfil':'12'},
+  {'Data':'2026-05-19','Link do Post':'https://www.instagram.com/reel/DYhUygmx4jq/','Tipo de Post':'VIDEO','Alcance':'5898','Curtidas':'459','Comentários':'52','Compartilhamentos':'17','Salvamentos':'62','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-20','Link do Post':'https://www.instagram.com/p/DYkra8vjBD6/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'4607','Curtidas':'315','Comentários':'3','Compartilhamentos':'13','Salvamentos':'14','Seguidores Ganhos':'0','Visitas ao Perfil':'68'},
+  {'Data':'2026-05-21','Link do Post':'https://www.instagram.com/p/DYmsriwGZUv/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'8908','Curtidas':'756','Comentários':'93','Compartilhamentos':'14','Salvamentos':'302','Seguidores Ganhos':'8','Visitas ao Perfil':'79'},
+  {'Data':'2026-05-23','Link do Post':'https://www.instagram.com/p/DYrmh17EXON/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'7515','Curtidas':'540','Comentários':'32','Compartilhamentos':'21','Salvamentos':'25','Seguidores Ganhos':'0','Visitas ao Perfil':'71'},
+  {'Data':'2026-05-25','Link do Post':'https://www.instagram.com/p/DYxBH_ijgTS/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'2745','Curtidas':'207','Comentários':'22','Compartilhamentos':'3','Salvamentos':'77','Seguidores Ganhos':'2','Visitas ao Perfil':'27'},
+];
+
+// ── UTILS ────────────────────────────────────────────────────
+const C = {cyan:'#00c6ff',green:'#00e5a0',yellow:'#ffd166',red:'#ff6b6b',purple:'#a78bfa',orange:'#f97316',pink:'#f472b6',blue:'#60a5fa',grid:'rgba(30,48,69,0.7)'};
+const PAL = [C.purple,C.cyan,C.green,C.orange,C.pink,C.yellow,C.blue,'#818cf8','#34d399','#fb923c'];
+const ch={};
+const R = id => document.getElementById(id);
+const fmtN = n => n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'k':String(n||0);
+const fmtR = v => 'R$ '+(+v||0).toFixed(2).replace('.',',');
+const money = s => {
+  let v=(s||'').replace(/R\$\s?/g,'').replace(/\s/g,'').replace(/-$/,'').trim();
+  if(v.includes(',')&&v.includes('.'))v=v.replace(/\./g,'').replace(',','.');
+  else if(v.includes(','))v=v.replace(',','.');
+  return parseFloat(v)||0;
+};
+const N = s => parseInt((s||'').replace(/\./g,''))||0;
+const mkChart=(id,cfg)=>{if(ch[id])ch[id].destroy();ch[id]=new Chart(R(id),cfg);};
+
+function switchTab(n,b){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  R('panel-'+n).classList.add('active'); b.classList.add('active');
+}
+function csvLine(l){const r=[];let c='',q=false;for(const x of l){if(x==='"'){q=!q;}else if(x===','&&!q){r.push(c);c='';}else c+=x;}r.push(c);return r;}
+function parseCSV(txt){
+  const ls=txt.trim().split('\n');
+  const hs=csvLine(ls[0]).map(h=>h.replace(/"/g,'').trim());
+  return ls.slice(1).filter(l=>l.trim()).map(l=>{
+    const v=csvLine(l).map(v=>v.replace(/^"|"$/g,'').trim());
+    return hs.reduce((o,h,i)=>{o[h]=v[i]||'';return o;},{});
+  });
+}
+function col(row,...names){
+  const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+  for(const n of names){
+    if(row[n]!==undefined&&row[n]!=='')return row[n];
+    const nk=norm(n);
+    const found=Object.entries(row).find(([k])=>norm(k)===nk);
+    if(found&&found[1]!=='')return found[1];
+  }
+  return'';
+}
+
+const tipoLabel=t=>t==='VIDEO'?'Vídeo':t==='CAROUSEL_ALBUM'?'Carrossel':t==='IMAGE'?'Imagem':t||'Post';
+const tipoPill=t=>t==='VIDEO'?'pill-v':t==='CAROUSEL_ALBUM'?'pill-c':'pill-i';
+const fmtDatePt=d=>{if(!d)return'—';const[y,m,day]=d.split('-');const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];return`${day} ${ms[+m-1]}`;}
+const postName=s=>{
+  const clean=s.replace(/^(Instagram post:|Post do Instagram:|Reel do Instagram:|REELS?|CARROSSEL?)\s*[-–:]?\s*/i,'').trim();
+  return clean.length>55?clean.substring(0,55)+'…':clean||s.substring(0,55);
+}
+const MS=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+function parseDailyDate(ddmm){
+  if(!ddmm||!ddmm.includes('/'))return null;
+  const[ds,ms]=ddmm.trim().split('/');
+  const d=parseInt(ds),m=parseInt(ms);
+  if(!d||!m||m<1||m>12)return null;
+  const year=m>=11?2025:2026;
+  const key=`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const mLabel=MS[m-1]+'/'+String(year).slice(2);
+  const mKey=`${year}-${String(m).padStart(2,'0')}`;
+  return{year,month:m,day:d,key,label:ddmm,mLabel,mKey};
+}
+
+let _allDailyRows=[];
+function renderDailyView(filterMKey){
+  const todayKey=new Date().toISOString().substring(0,10);
+  const base=filterMKey==='all'?_allDailyRows:_allDailyRows.filter(r=>r._pd&&r._pd.mKey===filterMKey);
+  const rows=base.filter(r=>r._pd&&r._pd.key<=todayKey);
+
+  const totInv =rows.reduce((a,r)=>a+r._inv,0);
+  const totSeg =rows.reduce((a,r)=>a+r._seg,0);
+  const totClk =rows.reduce((a,r)=>a+r._clk,0);
+  const totImp =rows.reduce((a,r)=>a+r._imp,0);
+  const avgCPS =totSeg>0?totInv/totSeg:0;
+  const avgCPC =totClk>0?totInv/totClk:0;
+  const avgCPM =totImp>0?totInv/totImp*1000:0;
+
+  R('d-invest').textContent=fmtR(totInv);
+  R('d-seg').textContent=totSeg>0?'+'+fmtN(totSeg):'—';
+  R('d-cps').textContent=avgCPS>0?fmtR(avgCPS):'—';
+  R('d-cliques').textContent=fmtN(totClk);
+  R('d-cpc-note').textContent=avgCPC>0?'CPC '+fmtR(avgCPC):'CPC —';
+  R('d-imp').textContent=fmtN(totImp);
+  R('d-cpm-note').textContent=avgCPM>0?'CPM '+fmtR(avgCPM):'CPM —';
+
+  const labels=rows.map(r=>r._pd.label);
+  const segArr=rows.map(r=>r._seg>0?r._seg:null);
+  const cpsArr=rows.map(r=>r._cps>0?+r._cps.toFixed(2):null);
+  const invArr=rows.map(r=>r._inv>0?+r._inv.toFixed(2):null);
+  const impArr=rows.map(r=>r._imp>0?r._imp:null);
+  const lineOpts=(color,dash=[])=>({borderColor:color,backgroundColor:'transparent',pointBackgroundColor:color,pointRadius:3,pointHoverRadius:5,borderWidth:2,borderDash:dash,tension:.35,fill:false,spanGaps:true});
+
+  mkChart('d-chart1',{type:'line',data:{labels,datasets:[
+    {...lineOpts(C.purple,[6,4]),label:'Novos Seguidores',data:segArr,yAxisID:'yA'},
+    {...lineOpts(C.cyan,[4,4]),label:'CPS (R$)',data:cpsArr,yAxisID:'yB'},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{boxWidth:10,padding:10,font:{size:11},usePointStyle:true}}},
+    scales:{
+      x:{grid:{color:C.grid},ticks:{maxRotation:60,font:{size:9}}},
+      yA:{position:'left',grid:{color:C.grid},title:{display:true,text:'Seguidores',color:C.purple,font:{size:10}}},
+      yB:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>`R$${v}`,color:C.cyan},title:{display:true,text:'CPS',color:C.cyan,font:{size:10}}},
+    }
+  }});
+
+  mkChart('d-chart2',{type:'line',data:{labels,datasets:[
+    {...lineOpts(C.green,[6,4]),label:'Investimento (R$)',data:invArr,yAxisID:'yA'},
+    {...lineOpts(C.orange,[4,4]),label:'Impressões',data:impArr,yAxisID:'yB'},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{boxWidth:10,padding:10,font:{size:11},usePointStyle:true}}},
+    scales:{
+      x:{grid:{color:C.grid},ticks:{maxRotation:60,font:{size:9}}},
+      yA:{position:'left',grid:{color:C.grid},ticks:{callback:v=>`R$${v}`}},
+      yB:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>fmtN(v),color:C.orange}},
+    }
+  }});
+
+  R('d-tbody').innerHTML=[...rows].reverse().map(r=>`<tr>
+    <td style="white-space:nowrap;font-weight:600;color:var(--sub)">${r._pd.label}</td>
+    <td class="tr" style="color:var(--purple)">${r._seg>0?'+'+r._seg:'—'}</td>
+    <td class="tr" style="color:var(--orange)">${r._inv>0?fmtR(r._inv):'—'}</td>
+    <td class="tr" style="color:var(--cyan)">${r._cps>0?fmtR(r._cps):'—'}</td>
+    <td class="tr">${r._clk>0?fmtN(r._clk):'—'}</td>
+    <td class="tr" style="color:var(--sub)">${r._cpc>0?fmtR(r._cpc):'—'}</td>
+    <td class="tr">${r._imp>0?fmtN(r._imp):'—'}</td>
+    <td class="tr" style="color:var(--sub)">${r._cpm>0?fmtR(r._cpm):'—'}</td>
+  </tr>`).join('');
+}
+
+window.setDailyMonth=function(mKey,btn){
+  document.querySelectorAll('.mf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDailyView(mKey);
+};
+
+// Parser posts Léo — colunas: [0]='' [1]=Ativo? [2]=ValorDiário [3]=Link [4]=Nome [5]=Inv [6]=Antes [7]=Depois [8]=Saldo [9]=CPS
+function parseLeoImps(csvTxt){
+  if(!csvTxt)return[];
+  const lines=csvTxt.trim().split('\n');
+  const posts=[];
+  for(const line of lines){
+    const c=csvLine(line).map(v=>v.replace(/^"|"$/g,'').trim());
+    const ativo=(c[1]||'').toLowerCase(),link=c[3]||'';
+    if(ativo==='verdadeiro'&&link.includes('instagram.com')){
+      const nome=c[4]||'',inv=money(c[5]||'');
+      const saldoRaw=(c[8]||'').replace(/\./g,'').replace(',','.');
+      const saldo=Math.round(parseFloat(saldoRaw)||0);
+      const cps=money(c[9]||'');
+      if(link)posts.push({nome,link,inv,saldo,cps});
+    }
+  }
+  return posts;
+}
+
+// Parser aba mista Léo — posts + daily na mesma aba
+function parseLeoMain(csvTxt){
+  const lines=csvTxt.trim().split('\n');
+  const posts=[],daily=[];
+  let section=null;
+  for(const line of lines){
+    const c=csvLine(line).map(v=>v.replace(/^"|"$/g,'').trim());
+    if(c[1]==='Ativo?'){section='posts';continue;}
+    if(c[0]==='Seguidores DATA'){section='daily';continue;}
+    if(section==='posts'){
+      const ativo=(c[1]||'').toLowerCase(),link=c[3]||'';
+      if(ativo==='verdadeiro'&&link.includes('instagram.com')){
+        const saldoRaw=(c[8]||'').replace(/\./g,'').replace(',','.');
+        posts.push({nome:c[4]||'',link,inv:money(c[5]||''),saldo:Math.round(parseFloat(saldoRaw)||0),cps:money(c[9]||'')});
+      }
+    } else if(section==='daily'){
+      if(!c[0]||!/^\d+\/\d+$/.test(c[0]))continue;
+      daily.push({'DATA':c[0],'Novos Seguidores':c[1],'Investimento diário':c[2],'Custo por novos seguidores':c[3],'Cliques':c[4],'CPC':c[5],'Impressões':c[6],'CPM':c[7]});
+    }
+  }
+  return{posts,daily};
+}
+
+function renderImp(dailyRows,postsData){
+  _allDailyRows=dailyRows.map(r=>{
+    const pd=parseDailyDate(col(r,'DATA','Data'));
+    const seg=parseInt(col(r,'Novos Seguidores'))||0;
+    const inv=money(col(r,'Investimento diário','Investimento diario','Investimento'));
+    const clk=parseInt(col(r,'Cliques'))||0;
+    const imp=parseInt((col(r,'Impressões','Impressoes')||'').replace(/\./g,''))||0;
+    const cps=money(col(r,'Custo por novos seguidores'))||(seg>0&&inv>0?inv/seg:0);
+    const cpc=money(col(r,'CPC'))||(clk>0&&inv>0?inv/clk:0);
+    const cpm=money(col(r,'CPM'))||(imp>0&&inv>0?inv/imp*1000:0);
+    return{...r,_pd:pd,_seg:seg,_inv:inv,_cps:cps,_clk:clk,_cpc:cpc,_imp:imp,_cpm:cpm};
+  }).filter(r=>r._pd).sort((a,b)=>a._pd.key.localeCompare(b._pd.key));
+
+  const mKeys=[...new Set(_allDailyRows.filter(r=>r._inv>0||r._seg>0).map(r=>r._pd.mKey))].sort();
+  const bar=R('month-filter-bar');
+  bar.innerHTML=`<button class="mf-btn" onclick="setDailyMonth('all',this)">Tudo</button>`+
+    mKeys.map(mk=>{
+      const[y,m]=mk.split('-');
+      const label=MS[+m-1]+'/'+String(+y).slice(2);
+      return`<button class="mf-btn" onclick="setDailyMonth('${mk}',this)">${label}</button>`;
+    }).join('');
+  const lastMKey=mKeys[mKeys.length-1]||'all';
+  const lastBtn=bar.querySelector(`[onclick*="${lastMKey}"]`)||bar.querySelector('.mf-btn');
+  if(lastBtn)lastBtn.classList.add('active');
+  renderDailyView(lastMKey||'all');
+
+  R('s-tbody').innerHTML=postsData.map(p=>`<tr>
+    <td class="tnm" title="${p.nome}">${postName(p.nome)}</td>
+    <td class="tr"><strong style="color:var(--purple)">${fmtN(p.saldo)}</strong></td>
+    <td class="tr" style="color:var(--green)">+${fmtN(p.saldo)}</td>
+    <td class="tr">${fmtR(p.inv)}</td>
+    <td class="tr" style="color:var(--cyan)">${p.cps>0?fmtR(p.cps):'—'}</td>
+    <td class="tr" style="color:var(--yellow)">—</td>
+    <td>${p.link?`<a href="${p.link}" target="_blank" class="lnk">🔗 Ver post</a>`:'—'}</td>
+  </tr>`).join('');
+}
+
+function renderOrg(rows){
+  rows.sort((a,b)=>new Date(b['Data'])-new Date(a['Data']));
+  const tot=rows.reduce((a,r)=>({
+    alcance:a.alcance+N(r['Alcance']),curtidas:a.curtidas+N(r['Curtidas']),
+    comentarios:a.comentarios+N(r['Comentários']),compart:a.compart+N(r['Compartilhamentos']),
+    salv:a.salv+N(r['Salvamentos']),segs:a.segs+N(r['Seguidores Ganhos']),
+    visitas:a.visitas+N(r['Visitas ao Perfil']),
+  }),{alcance:0,curtidas:0,comentarios:0,compart:0,salv:0,segs:0,visitas:0});
+
+  const n=rows.length;
+  R('o-posts').textContent=n;
+  R('o-alcance').textContent=fmtN(tot.alcance);
+  R('o-curtidas').textContent=fmtN(tot.curtidas);
+  R('o-avg-curt').textContent=Math.round(tot.curtidas/n)+'/post';
+  R('o-salv').textContent=fmtN(tot.salv);
+  R('o-avg-salv').textContent=Math.round(tot.salv/n)+'/post';
+  R('o-segs').textContent='+'+tot.segs;
+  R('o-comp').textContent=fmtN(tot.compart);
+  R('o-visitas').textContent=fmtN(tot.visitas);
+
+  const top=[...rows].sort((a,b)=>N(b['Alcance'])-N(a['Alcance'])).slice(0,10);
+  mkChart('o-chart1',{type:'bar',
+    data:{labels:top.map(r=>`${fmtDatePt(r['Data'])} · ${tipoLabel(r['Tipo de Post'])}`),
+      datasets:[{label:'Alcance',data:top.map(r=>N(r['Alcance'])),backgroundColor:PAL,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtN(ctx.parsed.x)+' alcance'}}},
+      scales:{x:{grid:{color:C.grid},ticks:{callback:v=>fmtN(v)}},y:{grid:{color:C.grid},ticks:{font:{size:11}}}}}
+  });
+  mkChart('o-chart2',{type:'doughnut',
+    data:{labels:['Curtidas','Salvamentos','Compartilhamentos','Comentários'],
+      datasets:[{data:[tot.curtidas,tot.salv,tot.compart,tot.comentarios],backgroundColor:[C.pink,C.green,C.yellow,C.cyan],borderColor:'#131f30',borderWidth:3,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10}},
+        tooltip:{callbacks:{label:ctx=>` ${fmtN(ctx.parsed)} (${Math.round(ctx.parsed/n)}/post médio)`}}}}
+  });
+
+  R('o-tbody').innerHTML=rows.map(r=>`<tr>
+    <td style="white-space:nowrap;color:var(--sub)">${fmtDatePt(r['Data'])}</td>
+    <td><span class="${tipoPill(r['Tipo de Post'])}">${tipoLabel(r['Tipo de Post'])}</span></td>
+    <td class="tr" style="color:var(--cyan)">${fmtN(N(r['Alcance']))}</td>
+    <td class="tr" style="color:var(--sub)">—</td>
+    <td class="tr" style="color:var(--pink)">${fmtN(N(r['Curtidas']))}</td>
+    <td class="tr">${N(r['Comentários'])||'—'}</td>
+    <td class="tr">${N(r['Compartilhamentos'])||'—'}</td>
+    <td class="tr" style="color:var(--green)">${N(r['Salvamentos'])||'—'}</td>
+    <td class="tr" style="color:var(--orange)">${N(r['Seguidores Ganhos'])>0?'+'+N(r['Seguidores Ganhos']):'—'}</td>
+    <td class="tr">${fmtN(N(r['Visitas ao Perfil']))}</td>
+    <td><a href="${r['Link do Post']}" target="_blank" class="lnk">🔗 Ver</a></td>
+  </tr>`).join('');
+}
+
+// ── LOAD ─────────────────────────────────────────────────────
+async function load(){
+  // Renderiza com dados hardcoded imediatamente
+  renderImp(BASE_DAILY, BASE_POSTS);
+  renderOrg(BASE_ORG);
+  R('h-sub').textContent='19/05 – 25/05 · dados de 26/05';
+  R('o-period').textContent=`${BASE_ORG.length} posts publicados`;
+
+  // Tenta atualizar ao vivo em background
+  const ts=Date.now();
+  try{
+    const[mainTxt,orgTxt]=await Promise.all([
+      fetch(`${GVT_MAIN}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
+      fetch(`${GVT_ORG}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
+    ]);
+    const{posts:lp,daily:ld}=parseLeoMain(mainTxt);
+    const orgRows=parseCSV(orgTxt).filter(r=>r['Data']&&!(r['Link do Post']||'').includes('/stories/'));
+
+    if(ld.length>0){
+      renderImp(ld,lp.length>0?lp:BASE_POSTS);
+      const actives=_allDailyRows.filter(r=>r._inv>0||r._seg>0);
+      const dMin=actives[0]?._pd?.label||'',dMax=actives[actives.length-1]?._pd?.label||'';
+      const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      R('h-sub').textContent=`${dMin} – ${dMax} · Atualizado às ${hora}`;
+    }
+    if(orgRows.length>0){
+      renderOrg(orgRows);
+      R('o-period').textContent=`${orgRows.length} posts publicados`;
+    }
+  }catch(e){
+    console.log('Live fetch:',e.message);
+  }
+}
+load();
+</script>
+</body>
+</html>
