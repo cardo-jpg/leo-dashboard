@@ -231,7 +231,7 @@
 <script>
 // ── SHEET IDs LÉON ───────────────────────────────────────────
 const LEO_MAIN_ID = '1txFlnOgVgBz2bdA1DM7574NKI1IlzjD2';
-const ORG_ID      = '1T2MhcCjA6jIdMTqUA3JVpIiMX6SgkwwftjyypHhNuSI';
+const ORG_ID      = '1VSLomOUzPhqml8DiF2nApZqCL8eFzGBeGk1cZrpcqLM';
 const GVT_MAIN    = `https://docs.google.com/spreadsheets/d/${LEO_MAIN_ID}/gviz/tq?tqx=out:csv`;
 const GVT_ORG     = `https://docs.google.com/spreadsheets/d/${ORG_ID}/gviz/tq?tqx=out:csv&gid=1387861195`;
 
@@ -246,34 +246,40 @@ const BASE_DAILY = [
   {'DATA':'25/05','Novos Seguidores':'10','Investimento diário':'R$ 20,50','Custo por novos seguidores':'R$ 2,05','Cliques':'130','CPC':'R$ 0,16','Impressões':'2600','CPM':'R$ 7,88'},
 ];
 const BASE_POSTS = [
-  {nome:'Carrossel - minhas obsessões do momento',         link:'https://www.instagram.com/p/DX_4QqbjWYx/', inv:30.15,saldo:115,cps:0.26},
-  {nome:'Carrossel - coisas simples que transformam o atendimento', link:'https://www.instagram.com/p/DYFI0krDwcp/', inv:28.15,saldo:68, cps:0.41},
-  {nome:'Carrossel - Foi assim que a maquiagem mudou a sua vida',   link:'https://www.instagram.com/p/DYKZOL1jRiG/', inv:33.72,saldo:1,  cps:33.72},
-  {nome:'carrossel - os bastidores da minha vida até aqui',         link:'https://www.instagram.com/p/DYkra8vjBD6/', inv:0,   saldo:0,  cps:0},
-  {nome:'carrossel - passo a passo maquiagem efeito glow perfeita', link:'https://www.instagram.com/p/DYmsriwGZUv/', inv:5.03,saldo:0,  cps:0},
+  {nome:'Carrossel - minhas obsessões do momento',                  link:'https://www.instagram.com/p/DX_4QqbjWYx/', inv:77.48,saldo:238,cps:0.33},
+  {nome:'Carrossel - coisas simples que transformam o atendimento', link:'https://www.instagram.com/p/DYFI0krDwcp/', inv:38.00,saldo:134,cps:0.28},
+  {nome:'Carrossel - Foi assim que a maquiagem mudou a sua vida',   link:'https://www.instagram.com/p/DYKZOL1jRiG/', inv:38.26,saldo:105,cps:0.36},
+  {nome:'carrossel - passo a passo maquiagem efeito glow perfeita', link:'https://www.instagram.com/p/DYmsriwGZUv/', inv:38.07,saldo:63, cps:0.60},
 ];
 const BASE_ORG = [
-  {'Data':'2026-04-26','Link do Post':'https://www.instagram.com/reel/DXmr90CEbkF/','Tipo de Post':'VIDEO','Alcance':'12579','Curtidas':'839','Comentários':'152','Compartilhamentos':'58','Salvamentos':'303','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-04-27','Link do Post':'https://www.instagram.com/reel/DXpyN_KkbAi/','Tipo de Post':'VIDEO','Alcance':'11280','Curtidas':'856','Comentários':'77','Compartilhamentos':'25','Salvamentos':'163','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-04-30','Link do Post':'https://www.instagram.com/reel/DXwJf-YxgB9/','Tipo de Post':'VIDEO','Alcance':'5320','Curtidas':'407','Comentários':'50','Compartilhamentos':'21','Salvamentos':'38','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-05','Link do Post':'https://www.instagram.com/p/DX9eIMAkeBZ/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'21927','Curtidas':'1210','Comentários':'134','Compartilhamentos':'22','Salvamentos':'466','Seguidores Ganhos':'9','Visitas ao Perfil':'176'},
-  {'Data':'2026-05-06','Link do Post':'https://www.instagram.com/p/DX_4QqbjWYx/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'36107','Curtidas':'2865','Comentários':'298','Compartilhamentos':'26','Salvamentos':'1348','Seguidores Ganhos':'336','Visitas ao Perfil':'710'},
-  {'Data':'2026-05-07','Link do Post':'https://www.instagram.com/reel/DYCUBx7Rv4M/','Tipo de Post':'VIDEO','Alcance':'17650','Curtidas':'332','Comentários':'57','Compartilhamentos':'16','Salvamentos':'41','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-08','Link do Post':'https://www.instagram.com/p/DYFI0krDwcp/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'12124','Curtidas':'1431','Comentários':'215','Compartilhamentos':'11','Salvamentos':'548','Seguidores Ganhos':'61','Visitas ao Perfil':'218'},
-  {'Data':'2026-05-09','Link do Post':'https://www.instagram.com/p/DYHlbs9EUa4/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'7042','Curtidas':'389','Comentários':'27','Compartilhamentos':'20','Salvamentos':'36','Seguidores Ganhos':'2','Visitas ao Perfil':'24'},
-  {'Data':'2026-05-10','Link do Post':'https://www.instagram.com/p/DYKZOL1jRiG/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'9722','Curtidas':'825','Comentários':'21','Compartilhamentos':'29','Salvamentos':'50','Seguidores Ganhos':'7','Visitas ao Perfil':'201'},
-  {'Data':'2026-05-11','Link do Post':'https://www.instagram.com/reel/DYMmq_dxMTA/','Tipo de Post':'VIDEO','Alcance':'19326','Curtidas':'1765','Comentários':'128','Compartilhamentos':'50','Salvamentos':'191','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-12','Link do Post':'https://www.instagram.com/reel/DYQaUppRkp2/','Tipo de Post':'VIDEO','Alcance':'18489','Curtidas':'980','Comentários':'95','Compartilhamentos':'31','Salvamentos':'162','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-13','Link do Post':'https://www.instagram.com/p/DYScATAkXRu/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'5674','Curtidas':'374','Comentários':'19','Compartilhamentos':'28','Salvamentos':'49','Seguidores Ganhos':'2','Visitas ao Perfil':'39'},
-  {'Data':'2026-05-14','Link do Post':'https://www.instagram.com/reel/DYUtkmmxzJq/','Tipo de Post':'VIDEO','Alcance':'3630','Curtidas':'290','Comentários':'28','Compartilhamentos':'43','Salvamentos':'18','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-14','Link do Post':'https://www.instagram.com/reel/DYVYj7exCM1/','Tipo de Post':'VIDEO','Alcance':'3739','Curtidas':'340','Comentários':'31','Compartilhamentos':'25','Salvamentos':'50','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-15','Link do Post':'https://www.instagram.com/p/DYXRJmhEVsR/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'2917','Curtidas':'302','Comentários':'74','Compartilhamentos':'12','Salvamentos':'208','Seguidores Ganhos':'3','Visitas ao Perfil':'24'},
-  {'Data':'2026-05-16','Link do Post':'https://www.instagram.com/p/DYaQerGERCk/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'3269','Curtidas':'289','Comentários':'15','Compartilhamentos':'10','Salvamentos':'20','Seguidores Ganhos':'0','Visitas ao Perfil':'12'},
-  {'Data':'2026-05-19','Link do Post':'https://www.instagram.com/reel/DYhUygmx4jq/','Tipo de Post':'VIDEO','Alcance':'5898','Curtidas':'459','Comentários':'52','Compartilhamentos':'17','Salvamentos':'62','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
-  {'Data':'2026-05-20','Link do Post':'https://www.instagram.com/p/DYkra8vjBD6/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'4607','Curtidas':'315','Comentários':'3','Compartilhamentos':'13','Salvamentos':'14','Seguidores Ganhos':'0','Visitas ao Perfil':'68'},
-  {'Data':'2026-05-21','Link do Post':'https://www.instagram.com/p/DYmsriwGZUv/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'8908','Curtidas':'756','Comentários':'93','Compartilhamentos':'14','Salvamentos':'302','Seguidores Ganhos':'8','Visitas ao Perfil':'79'},
-  {'Data':'2026-05-23','Link do Post':'https://www.instagram.com/p/DYrmh17EXON/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'7515','Curtidas':'540','Comentários':'32','Compartilhamentos':'21','Salvamentos':'25','Seguidores Ganhos':'0','Visitas ao Perfil':'71'},
-  {'Data':'2026-05-25','Link do Post':'https://www.instagram.com/p/DYxBH_ijgTS/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'2745','Curtidas':'207','Comentários':'22','Compartilhamentos':'3','Salvamentos':'77','Seguidores Ganhos':'2','Visitas ao Perfil':'27'},
+  {'Data':'2026-04-26','Link do Post':'https://www.instagram.com/reel/DXmr90CEbkF/','Tipo de Post':'VIDEO','Alcance':'12649','Curtidas':'844','Comentários':'153','Compartilhamentos':'58','Salvamentos':'306','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-04-27','Link do Post':'https://www.instagram.com/reel/DXpyN_KkbAi/','Tipo de Post':'VIDEO','Alcance':'11513','Curtidas':'864','Comentários':'81','Compartilhamentos':'25','Salvamentos':'167','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-04-30','Link do Post':'https://www.instagram.com/reel/DXwJf-YxgB9/','Tipo de Post':'VIDEO','Alcance':'5448','Curtidas':'408','Comentários':'50','Compartilhamentos':'21','Salvamentos':'38','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-05','Link do Post':'https://www.instagram.com/p/DX9eIMAkeBZ/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'22310','Curtidas':'1225','Comentários':'144','Compartilhamentos':'22','Salvamentos':'473','Seguidores Ganhos':'9','Visitas ao Perfil':'181'},
+  {'Data':'2026-05-06','Link do Post':'https://www.instagram.com/p/DX_4QqbjWYx/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'36556','Curtidas':'2890','Comentários':'303','Compartilhamentos':'26','Salvamentos':'1371','Seguidores Ganhos':'340','Visitas ao Perfil':'720'},
+  {'Data':'2026-05-07','Link do Post':'https://www.instagram.com/reel/DYCUBx7Rv4M/','Tipo de Post':'VIDEO','Alcance':'18851','Curtidas':'340','Comentários':'62','Compartilhamentos':'18','Salvamentos':'46','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-08','Link do Post':'https://www.instagram.com/p/DYFI0krDwcp/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'12446','Curtidas':'1458','Comentários':'219','Compartilhamentos':'11','Salvamentos':'563','Seguidores Ganhos':'66','Visitas ao Perfil':'227'},
+  {'Data':'2026-05-09','Link do Post':'https://www.instagram.com/p/DYHlbs9EUa4/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'7553','Curtidas':'391','Comentários':'30','Compartilhamentos':'20','Salvamentos':'37','Seguidores Ganhos':'2','Visitas ao Perfil':'24'},
+  {'Data':'2026-05-10','Link do Post':'https://www.instagram.com/p/DYKZOL1jRiG/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'9931','Curtidas':'835','Comentários':'22','Compartilhamentos':'29','Salvamentos':'49','Seguidores Ganhos':'11','Visitas ao Perfil':'204'},
+  {'Data':'2026-05-11','Link do Post':'https://www.instagram.com/reel/DYMmq_dxMTA/','Tipo de Post':'VIDEO','Alcance':'19584','Curtidas':'1776','Comentários':'128','Compartilhamentos':'50','Salvamentos':'195','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-12','Link do Post':'https://www.instagram.com/reel/DYQaUppRkp2/','Tipo de Post':'VIDEO','Alcance':'19047','Curtidas':'994','Comentários':'96','Compartilhamentos':'31','Salvamentos':'166','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-13','Link do Post':'https://www.instagram.com/p/DYScATAkXRu/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'5968','Curtidas':'377','Comentários':'20','Compartilhamentos':'28','Salvamentos':'49','Seguidores Ganhos':'2','Visitas ao Perfil':'41'},
+  {'Data':'2026-05-14','Link do Post':'https://www.instagram.com/reel/DYUtkmmxzJq/','Tipo de Post':'VIDEO','Alcance':'3873','Curtidas':'295','Comentários':'28','Compartilhamentos':'44','Salvamentos':'19','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-14','Link do Post':'https://www.instagram.com/reel/DYVYj7exCM1/','Tipo de Post':'VIDEO','Alcance':'4053','Curtidas':'353','Comentários':'31','Compartilhamentos':'25','Salvamentos':'53','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-15','Link do Post':'https://www.instagram.com/p/DYXRJmhEVsR/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'3255','Curtidas':'319','Comentários':'78','Compartilhamentos':'12','Salvamentos':'217','Seguidores Ganhos':'3','Visitas ao Perfil':'25'},
+  {'Data':'2026-05-16','Link do Post':'https://www.instagram.com/p/DYaQerGERCk/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'3589','Curtidas':'301','Comentários':'15','Compartilhamentos':'10','Salvamentos':'24','Seguidores Ganhos':'0','Visitas ao Perfil':'14'},
+  {'Data':'2026-05-19','Link do Post':'https://www.instagram.com/reel/DYhUygmx4jq/','Tipo de Post':'VIDEO','Alcance':'6541','Curtidas':'495','Comentários':'57','Compartilhamentos':'17','Salvamentos':'68','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-20','Link do Post':'https://www.instagram.com/p/DYkra8vjBD6/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'5507','Curtidas':'351','Comentários':'6','Compartilhamentos':'13','Salvamentos':'16','Seguidores Ganhos':'2','Visitas ao Perfil':'77'},
+  {'Data':'2026-05-21','Link do Post':'https://www.instagram.com/p/DYmsriwGZUv/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'11899','Curtidas':'968','Comentários':'121','Compartilhamentos':'16','Salvamentos':'410','Seguidores Ganhos':'12','Visitas ao Perfil':'107'},
+  {'Data':'2026-05-23','Link do Post':'https://www.instagram.com/p/DYrmh17EXON/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'8646','Curtidas':'585','Comentários':'36','Compartilhamentos':'22','Salvamentos':'29','Seguidores Ganhos':'0','Visitas ao Perfil':'80'},
+  {'Data':'2026-05-25','Link do Post':'https://www.instagram.com/p/DYxBH_ijgTS/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'4674','Curtidas':'309','Comentários':'33','Compartilhamentos':'5','Salvamentos':'122','Seguidores Ganhos':'6','Visitas ao Perfil':'41'},
+  {'Data':'2026-05-26','Link do Post':'https://www.instagram.com/reel/DYz-DqfxVh1/','Tipo de Post':'VIDEO','Alcance':'8681','Curtidas':'492','Comentários':'79','Compartilhamentos':'45','Salvamentos':'79','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-05-27','Link do Post':'https://www.instagram.com/p/DY1uj_xkTPq/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'3630','Curtidas':'291','Comentários':'23','Compartilhamentos':'10','Salvamentos':'18','Seguidores Ganhos':'2','Visitas ao Perfil':'17'},
+  {'Data':'2026-05-28','Link do Post':'https://www.instagram.com/p/DY5DSYYDj3K/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'6601','Curtidas':'461','Comentários':'82','Compartilhamentos':'3','Salvamentos':'131','Seguidores Ganhos':'10','Visitas ao Perfil':'76'},
+  {'Data':'2026-05-29','Link do Post':'https://www.instagram.com/p/DY64vT3kas3/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'4211','Curtidas':'290','Comentários':'21','Compartilhamentos':'29','Salvamentos':'23','Seguidores Ganhos':'1','Visitas ao Perfil':'9'},
+  {'Data':'2026-05-31','Link do Post':'https://www.instagram.com/reel/DZA5PTexMtV/','Tipo de Post':'VIDEO','Alcance':'8843','Curtidas':'309','Comentários':'26','Compartilhamentos':'30','Salvamentos':'13','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
+  {'Data':'2026-06-01','Link do Post':'https://www.instagram.com/p/DZDraCrEUaa/','Tipo de Post':'CAROUSEL_ALBUM','Alcance':'2959','Curtidas':'197','Comentários':'20','Compartilhamentos':'16','Salvamentos':'10','Seguidores Ganhos':'0','Visitas ao Perfil':'15'},
+  {'Data':'2026-06-03','Link do Post':'https://www.instagram.com/reel/DZIKHRRRz6q/','Tipo de Post':'VIDEO','Alcance':'3461','Curtidas':'346','Comentários':'38','Compartilhamentos':'16','Salvamentos':'56','Seguidores Ganhos':'0','Visitas ao Perfil':'0'},
 ];
 
 // ── UTILS ────────────────────────────────────────────────────
@@ -544,7 +550,7 @@ async function load(){
   // Renderiza com dados hardcoded imediatamente
   renderImp(BASE_DAILY, BASE_POSTS);
   renderOrg(BASE_ORG);
-  R('h-sub').textContent='19/05 – 25/05 · dados de 26/05';
+  R('h-sub').textContent='19/05 – 25/05 · dados de 04/06';
   R('o-period').textContent=`${BASE_ORG.length} posts publicados`;
 
   // Tenta atualizar ao vivo em background
