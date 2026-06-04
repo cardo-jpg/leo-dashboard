@@ -233,6 +233,7 @@
 const LEO_MAIN_ID = '1txFlnOgVgBz2bdA1DM7574NKI1IlzjD2';
 const ORG_ID      = '1VSLomOUzPhqml8DiF2nApZqCL8eFzGBeGk1cZrpcqLM';
 const GVT_MAIN    = `https://docs.google.com/spreadsheets/d/${LEO_MAIN_ID}/gviz/tq?tqx=out:csv`;
+const GVT_DAILY   = `https://docs.google.com/spreadsheets/d/${LEO_MAIN_ID}/gviz/tq?tqx=out:csv&gid=992204182`;
 const GVT_ORG     = `https://docs.google.com/spreadsheets/d/${ORG_ID}/gviz/tq?tqx=out:csv&gid=1387861195`;
 
 // ── DADOS HARDCODED (26/05) — renderizados imediatamente ─────
@@ -244,6 +245,15 @@ const BASE_DAILY = [
   {'DATA':'23/05','Novos Seguidores':'13','Investimento diário':'R$ 12,52','Custo por novos seguidores':'R$ 0,96','Cliques':'79', 'CPC':'R$ 0,16','Impressões':'1541','CPM':'R$ 8,12'},
   {'DATA':'24/05','Novos Seguidores':'23','Investimento diário':'R$ 20,29','Custo por novos seguidores':'R$ 0,88','Cliques':'177','CPC':'R$ 0,11','Impressões':'2591','CPM':'R$ 7,83'},
   {'DATA':'25/05','Novos Seguidores':'10','Investimento diário':'R$ 20,50','Custo por novos seguidores':'R$ 2,05','Cliques':'130','CPC':'R$ 0,16','Impressões':'2600','CPM':'R$ 7,88'},
+  {'DATA':'26/05','Novos Seguidores':'20','Investimento diário':'R$ 28,55','Custo por novos seguidores':'R$ 1,43','Cliques':'169','CPC':'R$ 0,17','Impressões':'4023','CPM':'R$ 7,10'},
+  {'DATA':'27/05','Novos Seguidores':'25','Investimento diário':'R$ 27,94','Custo por novos seguidores':'R$ 1,12','Cliques':'182','CPC':'R$ 0,15','Impressões':'4099','CPM':'R$ 6,82'},
+  {'DATA':'28/05','Novos Seguidores':'30','Investimento diário':'R$ 27,88','Custo por novos seguidores':'R$ 0,93','Cliques':'185','CPC':'R$ 0,15','Impressões':'3861','CPM':'R$ 7,22'},
+  {'DATA':'29/05','Novos Seguidores':'22','Investimento diário':'R$ 28,10','Custo por novos seguidores':'R$ 1,28','Cliques':'204','CPC':'R$ 0,14','Impressões':'4173','CPM':'R$ 6,73'},
+  {'DATA':'30/05','Novos Seguidores':'22','Investimento diário':'R$ 23,76','Custo por novos seguidores':'R$ 1,08','Cliques':'145','CPC':'R$ 0,16','Impressões':'3504','CPM':'R$ 6,78'},
+  {'DATA':'31/05','Novos Seguidores':'22','Investimento diário':'R$ 31,31','Custo por novos seguidores':'R$ 1,42','Cliques':'210','CPC':'R$ 0,15','Impressões':'4971','CPM':'R$ 6,30'},
+  {'DATA':'01/06','Novos Seguidores':'23','Investimento diário':'R$ 29,32','Custo por novos seguidores':'R$ 1,27','Cliques':'243','CPC':'R$ 0,12','Impressões':'4875','CPM':'R$ 6,01'},
+  {'DATA':'02/06','Novos Seguidores':'13','Investimento diário':'R$ 28,43','Custo por novos seguidores':'R$ 2,19','Cliques':'185','CPC':'R$ 0,15','Impressões':'4779','CPM':'R$ 5,95'},
+  {'DATA':'03/06','Novos Seguidores':'21','Investimento diário':'R$ 26,19','Custo por novos seguidores':'R$ 1,25','Cliques':'161','CPC':'R$ 0,16','Impressões':'2728','CPM':'R$ 9,60'},
 ];
 const BASE_POSTS = [
   {nome:'Carrossel - minhas obsessões do momento',                  link:'https://www.instagram.com/p/DX_4QqbjWYx/', inv:77.48,saldo:238,cps:0.33},
@@ -550,21 +560,23 @@ async function load(){
   // Renderiza com dados hardcoded imediatamente
   renderImp(BASE_DAILY, BASE_POSTS);
   renderOrg(BASE_ORG);
-  R('h-sub').textContent='19/05 – 25/05 · dados de 04/06';
+  R('h-sub').textContent='19/05 – 03/06 · dados de 04/06';
   R('o-period').textContent=`${BASE_ORG.length} posts publicados`;
 
   // Tenta atualizar ao vivo em background
   const ts=Date.now();
   try{
-    const[mainTxt,orgTxt]=await Promise.all([
+    const[mainTxt,dailyTxt,orgTxt]=await Promise.all([
       fetch(`${GVT_MAIN}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
+      fetch(`${GVT_DAILY}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
       fetch(`${GVT_ORG}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
     ]);
-    const{posts:lp,daily:ld}=parseLeoMain(mainTxt);
+    const lp=parseLeoImps(mainTxt);
+    const dailyRows=parseCSV(dailyTxt).filter(r=>r['DATA']&&r['Novos Seguidores']);
     const orgRows=parseCSV(orgTxt).filter(r=>r['Data']&&!(r['Link do Post']||'').includes('/stories/'));
 
-    if(ld.length>0){
-      renderImp(ld,lp.length>0?lp:BASE_POSTS);
+    if(dailyRows.length>0){
+      renderImp(dailyRows, lp.length>0?lp:BASE_POSTS);
       const actives=_allDailyRows.filter(r=>r._inv>0||r._seg>0);
       const dMin=actives[0]?._pd?.label||'',dMax=actives[actives.length-1]?._pd?.label||'';
       const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
