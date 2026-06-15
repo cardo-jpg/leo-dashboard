@@ -236,7 +236,7 @@
   <p class="sec-title">Captação CDA · Leads Diários · 08/06 – 11/07</p>
   <div class="kpi-row">
     <div class="kpi k-purple"><p class="kpi-lbl">Total Leads</p><p class="kpi-val cv" id="c-total">—</p><p class="kpi-note" id="c-period">campanha em andamento</p></div>
-    <div class="kpi k-green"><p class="kpi-lbl">Leads Orgânicos</p><p class="kpi-val cg" id="c-org">—</p><p class="kpi-note">captação orgânica</p></div>
+    <div class="kpi k-green"><p class="kpi-lbl">Leads Orgânicos</p><p class="kpi-val cg" id="c-org">—</p><p class="kpi-note" id="c-org-note">meta: 1.200</p></div>
     <div class="kpi k-orange"><p class="kpi-lbl">Leads via Ads</p><p class="kpi-val co" id="c-ads">—</p><p class="kpi-note">tráfego pago</p></div>
     <div class="kpi k-cyan"><p class="kpi-lbl">Dias Ativos</p><p class="kpi-val cc" id="c-dias">—</p><p class="kpi-note" id="c-dias-rest">de 33 dias</p></div>
     <div class="kpi k-yellow"><p class="kpi-lbl">Verba / Dia</p><p class="kpi-val cy">R$ 81,81</p><p class="kpi-note">R$ 2.700 total</p></div>
@@ -255,6 +255,22 @@
       <span style="font-size:10px;color:var(--sub)">08 jun</span>
       <span id="c-prog-pct" style="font-size:10px;color:var(--purple);font-weight:700;">0%</span>
       <span style="font-size:10px;color:var(--sub)">11 jul</span>
+    </div>
+  </div>
+
+  <!-- barra de meta orgânica -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-size:12px;font-weight:700;">Meta Orgânica</span>
+      <span style="font-size:11px;color:var(--sub)" id="c-meta-label">0 de 1.200 leads</span>
+    </div>
+    <div style="background:var(--border);border-radius:20px;height:8px;overflow:hidden;">
+      <div id="c-meta-bar" style="height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),var(--cyan));width:0%;transition:width .6s ease;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;">
+      <span style="font-size:10px;color:var(--sub)">0</span>
+      <span id="c-meta-pct" style="font-size:10px;color:var(--green);font-weight:700;">0%</span>
+      <span style="font-size:10px;color:var(--sub)">1.200</span>
     </div>
   </div>
 
@@ -662,13 +678,21 @@ function renderCap(rows){
     if(org>0||ads>0) diasAtivos++;
   }
 
-  const totLeads = totOrg + totAds;
-  R('c-total').textContent   = totLeads > 0 ? totLeads : '0';
-  R('c-org').textContent     = totOrg > 0 ? totOrg : '0';
-  R('c-ads').textContent     = totAds > 0 ? totAds : '0';
-  R('c-dias').textContent    = diasAtivos;
+  const META_ORG  = 1200;
+  const totLeads  = totOrg + totAds;
+  const metaPct   = Math.min(100, Math.round(totOrg / META_ORG * 100));
+
+  R('c-total').textContent     = totLeads > 0 ? totLeads : '0';
+  R('c-org').textContent       = totOrg > 0 ? totOrg : '0';
+  R('c-org-note').textContent  = `${metaPct}% da meta (1.200)`;
+  R('c-ads').textContent       = totAds > 0 ? totAds : '0';
+  R('c-dias').textContent      = diasAtivos;
   R('c-dias-rest').textContent = `${totalDays - elapsed} dias restantes`;
-  R('c-period').textContent  = totLeads > 0 ? `${totOrg} org + ${totAds} ads` : 'aguardando dados';
+  R('c-period').textContent    = totLeads > 0 ? `${totOrg} org + ${totAds} ads` : 'aguardando dados';
+
+  R('c-meta-bar').style.width  = metaPct + '%';
+  R('c-meta-pct').textContent  = metaPct + '%';
+  R('c-meta-label').textContent= `${totOrg.toLocaleString('pt-BR')} de 1.200 leads orgânicos`;
 
   // Gráfico 1 — barras por dia
   mkChart('c-chart1',{type:'bar',data:{labels,datasets:[
