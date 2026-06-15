@@ -104,6 +104,7 @@
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('imp',this)">🚀 Impulsionados + Seguidores</button>
   <button class="tab-btn" onclick="switchTab('org',this)">🌱 Orgânico</button>
+  <button class="tab-btn" onclick="switchTab('cap',this)">📣 Captação CDA</button>
 </div>
 
 <!-- ══ IMPULSIONADOS + SEGUIDORES ═══════════════════════════════ -->
@@ -228,6 +229,67 @@
 </div>
 </div>
 
+<!-- ══ CAPTAÇÃO CDA ══════════════════════════════════════════ -->
+<div id="panel-cap" class="tab-panel">
+<div class="container">
+
+  <p class="sec-title">Captação CDA · Leads Diários · 08/06 – 11/07</p>
+  <div class="kpi-row">
+    <div class="kpi k-purple"><p class="kpi-lbl">Total Leads</p><p class="kpi-val cv" id="c-total">—</p><p class="kpi-note" id="c-period">campanha em andamento</p></div>
+    <div class="kpi k-green"><p class="kpi-lbl">Leads Orgânicos</p><p class="kpi-val cg" id="c-org">—</p><p class="kpi-note">captação orgânica</p></div>
+    <div class="kpi k-orange"><p class="kpi-lbl">Leads via Ads</p><p class="kpi-val co" id="c-ads">—</p><p class="kpi-note">tráfego pago</p></div>
+    <div class="kpi k-cyan"><p class="kpi-lbl">Dias Ativos</p><p class="kpi-val cc" id="c-dias">—</p><p class="kpi-note" id="c-dias-rest">de 33 dias</p></div>
+    <div class="kpi k-yellow"><p class="kpi-lbl">Verba / Dia</p><p class="kpi-val cy">R$ 81,81</p><p class="kpi-note">R$ 2.700 total</p></div>
+  </div>
+
+  <!-- barra de progresso da campanha -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-size:12px;font-weight:700;">Progresso da Campanha</span>
+      <span style="font-size:11px;color:var(--sub)" id="c-prog-label">08/06 → 11/07</span>
+    </div>
+    <div style="background:var(--border);border-radius:20px;height:8px;overflow:hidden;">
+      <div id="c-prog-bar" style="height:100%;border-radius:20px;background:linear-gradient(90deg,var(--purple),var(--pink));width:0%;transition:width .6s ease;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;">
+      <span style="font-size:10px;color:var(--sub)">08 jun</span>
+      <span id="c-prog-pct" style="font-size:10px;color:var(--purple);font-weight:700;">0%</span>
+      <span style="font-size:10px;color:var(--sub)">11 jul</span>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-box">
+      <p class="chart-box-ttl">Leads por Dia</p>
+      <p class="chart-box-sub">Orgânicos vs Ads · barras empilhadas</p>
+      <div class="cw h280"><canvas id="c-chart1"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <p class="chart-box-ttl">Leads Acumulados</p>
+      <p class="chart-box-sub">Total acumulado desde o início da campanha</p>
+      <div class="cw h280"><canvas id="c-chart2"></canvas></div>
+    </div>
+  </div>
+
+  <div class="tbl-box">
+    <div class="tbl-head"><span class="tbl-head-title">Detalhamento por Dia · Leads</span></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>Data</th>
+          <th class="tr">Leads Org.</th>
+          <th class="tr">Leads Ads</th>
+          <th class="tr">Total do Dia</th>
+          <th class="tr">Acumulado</th>
+        </tr></thead>
+        <tbody id="c-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+
 <script>
 // ── SHEET IDs LÉON ───────────────────────────────────────────
 const LEO_MAIN_ID = '1txFlnOgVgBz2bdA1DM7574NKI1IlzjD2';
@@ -235,6 +297,8 @@ const ORG_ID      = '1VSLomOUzPhqml8DiF2nApZqCL8eFzGBeGk1cZrpcqLM';
 const GVT_MAIN    = `https://docs.google.com/spreadsheets/d/${LEO_MAIN_ID}/gviz/tq?tqx=out:csv`;
 const GVT_DAILY   = `https://docs.google.com/spreadsheets/d/${LEO_MAIN_ID}/gviz/tq?tqx=out:csv&gid=992204182`;
 const GVT_ORG     = `https://docs.google.com/spreadsheets/d/${ORG_ID}/gviz/tq?tqx=out:csv&gid=1387861195`;
+const CAP_ID      = '1uSyHTXWefAnPdBxRD1yMgK0wMJJNms8SlRB3EzDD86o';
+const GVT_CAP     = `https://docs.google.com/spreadsheets/d/${CAP_ID}/gviz/tq?tqx=out:csv&gid=1704118724`;
 
 // ── DADOS HARDCODED (26/05) — renderizados imediatamente ─────
 const BASE_DAILY = [
@@ -555,25 +619,133 @@ function renderOrg(rows){
   </tr>`).join('');
 }
 
+// ── CAPTAÇÃO CDA ─────────────────────────────────────────────
+function renderCap(rows){
+  const CAP_START = new Date('2026-06-08');
+  const CAP_END   = new Date('2026-07-11');
+  const today     = new Date();
+
+  // progresso da campanha
+  const totalDays = Math.round((CAP_END - CAP_START) / 86400000) + 1;
+  const elapsed   = Math.max(0, Math.min(totalDays, Math.round((today - CAP_START) / 86400000) + 1));
+  const pct       = Math.round(elapsed / totalDays * 100);
+  R('c-prog-bar').style.width = pct + '%';
+  R('c-prog-pct').textContent = pct + '%';
+  R('c-prog-label').textContent = `Dia ${elapsed} de ${totalDays}`;
+
+  // filtra apenas linhas com data válida
+  const active = rows.filter(r => {
+    const d = r['Data'] || '';
+    return /\d{2}\/\d{2}\/\d{4}/.test(d) || /\d{4}-\d{2}-\d{2}/.test(d);
+  });
+
+  const fmtDate = s => {
+    if(!s) return '—';
+    const parts = s.includes('/') ? s.split('/') : s.split('-').reverse();
+    return `${parts[0]}/${parts[1]}`;
+  };
+
+  let acum = 0;
+  const labels=[], orgArr=[], adsArr=[], acumArr=[];
+  let totOrg=0, totAds=0, diasAtivos=0;
+
+  for(const r of active){
+    const org = parseInt(r['Leads Captação Org'])||0;
+    const ads = parseInt(r['Leads Captação Ads'])||0;
+    acum += org + ads;
+    labels.push(fmtDate(r['Data']));
+    orgArr.push(org);
+    adsArr.push(ads);
+    acumArr.push(acum);
+    totOrg += org;
+    totAds += ads;
+    if(org>0||ads>0) diasAtivos++;
+  }
+
+  const totLeads = totOrg + totAds;
+  R('c-total').textContent   = totLeads > 0 ? totLeads : '0';
+  R('c-org').textContent     = totOrg > 0 ? totOrg : '0';
+  R('c-ads').textContent     = totAds > 0 ? totAds : '0';
+  R('c-dias').textContent    = diasAtivos;
+  R('c-dias-rest').textContent = `${totalDays - elapsed} dias restantes`;
+  R('c-period').textContent  = totLeads > 0 ? `${totOrg} org + ${totAds} ads` : 'aguardando dados';
+
+  // Gráfico 1 — barras por dia
+  mkChart('c-chart1',{type:'bar',data:{labels,datasets:[
+    {label:'Org.',data:orgArr,backgroundColor:C.green+'cc',borderRadius:4,stack:'s'},
+    {label:'Ads',data:adsArr,backgroundColor:C.orange+'cc',borderRadius:4,stack:'s'},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{boxWidth:10,padding:10,font:{size:11},usePointStyle:true}}},
+    scales:{
+      x:{grid:{color:C.grid},ticks:{maxRotation:60,font:{size:9}}},
+      y:{grid:{color:C.grid},ticks:{stepSize:1}},
+    }
+  }});
+
+  // Gráfico 2 — acumulado
+  const lineOpts=(color)=>({borderColor:color,backgroundColor:color+'22',pointBackgroundColor:color,pointRadius:2,pointHoverRadius:5,borderWidth:2,tension:.35,fill:true,spanGaps:true});
+  mkChart('c-chart2',{type:'line',data:{labels,datasets:[
+    {...lineOpts(C.purple),label:'Acumulado',data:acumArr},
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:C.grid},ticks:{maxRotation:60,font:{size:9}}},
+      y:{grid:{color:C.grid},ticks:{stepSize:1}},
+    }
+  }});
+
+  // Tabela
+  let ac=0;
+  const rowsWithData = active.filter(r=>(parseInt(r['Leads Captação Org'])||0)+(parseInt(r['Leads Captação Ads'])||0)>0);
+  if(rowsWithData.length===0){
+    R('c-tbody').innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--sub);padding:24px">Aguardando primeiros dados da campanha</td></tr>`;
+  } else {
+    const tableRows=[...active].reverse();
+    R('c-tbody').innerHTML=tableRows.map(r=>{
+      const org=parseInt(r['Leads Captação Org'])||0;
+      const ads=parseInt(r['Leads Captação Ads'])||0;
+      const tot=org+ads;
+      // acumulado em ordem decrescente é complexo, mostra só total diário
+      return `<tr>
+        <td style="color:var(--sub);font-weight:600">${fmtDate(r['Data'])}</td>
+        <td class="tr" style="color:var(--green)">${org>0?'+'+org:'—'}</td>
+        <td class="tr" style="color:var(--orange)">${ads>0?'+'+ads:'—'}</td>
+        <td class="tr" style="color:var(--purple);font-weight:700">${tot>0?tot:'—'}</td>
+        <td class="tr" style="color:var(--sub)">—</td>
+      </tr>`;
+    }).join('');
+    // recalcula acumulado na ordem certa
+    let runAc=0;
+    const trs=R('c-tbody').querySelectorAll('tr');
+    const fwdRows=[...active];
+    const acums=fwdRows.map(r=>{runAc+=(parseInt(r['Leads Captação Org'])||0)+(parseInt(r['Leads Captação Ads'])||0);return runAc;});
+    const revAcums=[...acums].reverse();
+    trs.forEach((tr,i)=>{const tds=tr.querySelectorAll('td');if(tds[4])tds[4].textContent=revAcums[i]||'—';});
+  }
+}
+
 // ── LOAD ─────────────────────────────────────────────────────
 async function load(){
   // Renderiza com dados hardcoded imediatamente
   renderImp(BASE_DAILY, BASE_POSTS);
   renderOrg(BASE_ORG);
+  renderCap([]);
   R('h-sub').textContent='19/05 – 03/06 · dados de 04/06';
   R('o-period').textContent=`${BASE_ORG.length} posts publicados`;
 
   // Tenta atualizar ao vivo em background
   const ts=Date.now();
   try{
-    const[mainTxt,dailyTxt,orgTxt]=await Promise.all([
+    const[mainTxt,dailyTxt,orgTxt,capTxt]=await Promise.all([
       fetch(`${GVT_MAIN}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
       fetch(`${GVT_DAILY}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
       fetch(`${GVT_ORG}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
+      fetch(`${GVT_CAP}&_=${ts}`,{cache:'no-cache'}).then(r=>r.text()),
     ]);
     const lp=parseLeoImps(mainTxt);
     const dailyRows=parseCSV(dailyTxt).filter(r=>r['DATA']&&r['Novos Seguidores']);
     const orgRows=parseCSV(orgTxt).filter(r=>r['Data']&&!(r['Link do Post']||'').includes('/stories/'));
+    const capRows=parseCSV(capTxt).filter(r=>r['Data']);
 
     if(dailyRows.length>0){
       renderImp(dailyRows, lp.length>0?lp:BASE_POSTS);
@@ -586,6 +758,7 @@ async function load(){
       renderOrg(orgRows);
       R('o-period').textContent=`${orgRows.length} posts publicados`;
     }
+    if(capRows.length>0) renderCap(capRows);
   }catch(e){
     console.log('Live fetch:',e.message);
   }
